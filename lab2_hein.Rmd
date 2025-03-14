@@ -5,3 +5,113 @@ date: "14-3-2025"
 output: html_document
 ---
 
+```{r packages}
+#install.packages("igraph")
+#install.packages("visNetwork")
+
+library(igraph)
+library(RColorBrewer)
+library(visNetwork)
+```
+```{r data}
+#import data
+Facebook_edge<-read.csv("Facebook_edge.csv",header=FALSE)
+Facebook_att<-read.csv("Facebook_att.csv",header = TRUE)
+```
+
+
+```{r layout}
+#reshape nodes and edges
+Facebook_nodes<-data.frame(name=as.character(Facebook_att$NodeID),
+ gender=as.character(Facebook_att$sex),
+ group=as.character(Facebook_att$group))
+
+Facebook_edges<-data.frame(from=c(as.character(Facebook_edge[,1])),
+ to=c(as.character(Facebook_edge[,2])))
+
+#setup graph
+Facebook<-graph_from_data_frame(Facebook_edges,directed = FALSE,vertices =
+Facebook_nodes)
+
+summary(Facebook)
+
+set.seed(100)
+
+#interactive layout
+Facebook_interactive_layout<-visNetwork(data.frame(id=V(Facebook)$name),
+Facebook_edges, main = "Facebook", submain="Can zoom in/out to check
+the IDs and ties") %>%
+ visIgraphLayout(layout = "layout_nicely",smooth = FALSE) %>%
+ visNodes(shape="circle",label = TRUE) %>%
+ visOptions(highlightNearest = list(enabled = T, hover = T),
+nodesIdSelection = T)
+
+Facebook_interactive_layout
+
+```
+```{r node_metrics}
+# setting up metrics
+degree(Facebook, v="S1")
+
+closeness(Facebook, v="S1", normalized = TRUE)
+
+betweenness(Facebook, v="S1", directed = FALSE, normalized = TRUE)
+
+eigen_centrality <- evcent(Facebook)$vector
+
+eigen_centrality["S1"]
+
+transitivity(Facebook, v="S1")
+
+# storing metrics
+deg <- degree(Facebook, mode = "all")
+cls <- closeness(Facebook, normalized = TRUE)
+btw <- betweenness(Facebook, directed = FALSE, normalized = TRUE)
+eig <- as.numeric(evcent(Facebook)$vector)
+lcl <- transitivity(Facebook, type = "local")
+
+#get top 5 metrics
+deg_sort <- tail(sort(deg),5)
+cls_sort <- tail(sort(cls),5)
+btw_sort <- tail(sort(btw),5)
+eig_sort <- tail(sort(eig),5)
+lcl_sort <- tail(sort(lcl),5)
+eig_sort
+```
+
+
+```{r plot}
+par(mfrow = c(2,2))
+plot(deg_sort, cls_sort, main = "Degree versus closeness",
+ xlab = "Degree", ylab = "Closeness")
+plot(deg_sort, btw_sort, main = "Degree versus betweenness",
+ xlab = "Degree", ylab = "Betweenness")
+plot(deg_sort, eig_sort, main = "Degree versus eigenvector",
+ xlab = "Degree", ylab = "Eigenvector")
+plot(deg_sort, lcl_sort, main = "Degree versus local clustering",
+ xlab = "Degree", ylab = "Local clustering")
+
+```
+```{r network_metrics}
+deg_dist <- degree_distribution(Facebook)
+barplot(deg_dist)
+edge_density(Facebook)
+diameter(Facebook, directed = FALSE)
+transitivity(Facebook, type = "global")
+centr_degree(Facebook)$centralization
+```
+```{r components-facebook}
+components(Facebook)
+```
+```{r network_grouped}
+group <- unique(as.factor(V(Facebook)$group))
+
+pal <- brewer.pal(nlevels(group), "Set1")
+
+group_colors <- setNames(pal,group)
+
+plot(Facebook, vertex.color = group_colors[V(Facebook)$group], main = "Network colored by group")
+legend("topleft", legend = names(group_colors), fill = group_colors, title = "group")
+
+```
+
