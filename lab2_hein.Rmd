@@ -1,0 +1,7 @@
+---
+title: "Lab2"
+author: "Hein Brouwer"
+date: "14-3-2025"
+output: html_document
+---
+

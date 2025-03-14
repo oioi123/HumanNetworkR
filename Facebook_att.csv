@@ -1,0 +1,94 @@
+NodeID,friend_count,group,mutual_friend_count,relationship_status,sex,names
+S1,73,Family,37,Married,female,SE
+S2,53,GraduateSchool,3,Married,male,PH
+S3,363,GraduateSchool,3,Married,female,PD
+S4,64,GraduateSchool,4,,female,LN
+S5,19,Family,10,,female,MB
+S6,99,College,1,In a Relationship,female,AP
+S7,432,College,1,In a Relationship,male,SM
+S8,22,Work,3,,female,CB
+S9,153,Work,9,,male,TB2
+S10,63,Work,6,,male,RBW
+S11,298,Work,12,Married,female,NW
+S12,834,Family,26,Single,female,AL
+S13,143,Music,3,,male,DB
+S14,128,Music,4,,female,CWB
+S15,143,Music,8,,male,BS
+S16,363,Music,13,,female,AC
+S17,373,Music,6,,female,BW
+S18,79,Music,3,Married,male,DZM
+S19,42,Music,5,,male,KW
+S20,83,Work,3,,female,VST
+S21,,Work,12,,male,TM
+S22,604,Family,6,Single,male,CR
+S23,508,Family,23,Single,male,AAE
+S24,307,Family,6,Married,female,HRS
+S25,67,Family,7,,female,LRS
+S26,31,Family,19,,female,SL
+S27,236,College,2,,male,JJ
+S28,250,College,2,Married,male,TBC
+S29,191,College,2,,female,LE
+S30,405,Family,19,Married,female,BCL
+S31,271,Family,21,Married,female,SLL
+S32,80,GraduateSchool,1,,male,TNB
+S33,176,GraduateSchool,3,Single,female,MGE
+S34,97,GraduateSchool,4,Married,female,JLG
+S35,62,GraduateSchool,2,Married,male,DGT
+S36,63,Work,6,Married,female,DK
+S37,110,Work,6,Married,male,WT
+S38,122,Work,7,Married,male,DSW
+S39,115,Work,10,Married,male,ME
+S40,1316,Music,5,In a Relationship,male,MWB
+S41,224,Music,5,,female,BD
+S42,461,Music,4,In a Relationship,female,LL
+S43,95,Music,6,,male,BB
+S44,390,Music,7,Married,female,LSM
+S45,283,Music,7,,female,KM
+S46,201,Spiel,5,Married,male,SP
+S47,199,Spiel,5,Married,female,LCP
+S48,217,Spiel,5,Married,male,ADE
+S49,271,Spiel,5,,male,KH
+S50,304,Spiel,5,,female,ECS
+S51,322,Spiel,5,,male,KT
+S52,502,HighSchool,4,Married,female,GB
+S53,65,HighSchool,1,,female,RBH
+S54,15,HighSchool,1,,male,JU
+S55,97,HighSchool,2,Married,female,JZ
+S56,,Music,2,Married,male,DSM
+S57,123,Family,16,Married,male,BL
+S58,230,Family,14,,female,CG
+S59,231,Family,11,In a Relationship,female,CSH
+S60,282,Family,17,Married,female,GGA
+S61,491,Family,16,In a Relationship,male,ADL
+S62,141,Family,18,Married,male,DL
+S63,278,Family,13,,female,LBF
+S64,302,Family,18,In a Relationship,male,GL
+S65,78,Family,9,,female,CS
+S66,100,Family,14,Married,female,DSF
+S67,575,Family,16,,male,ALL
+S68,196,BookClub,6,Married,female,CW1
+S69,51,BookClub,6,,male,DZB
+S70,60,BookClub,6,,male,PW
+S71,131,BookClub,6,,female,ARL
+S72,109,BookClub,6,,female,LZ
+S73,,Music,4,,female,MBM
+S74,199,Work,8,Married,male,RW
+S75,,Work,2,Married,female,ECW
+S76,135,Work,12,Married,female,JK
+S77,746,Work,2,Married,female,ASS
+S78,492,Work,3,,female,SS1
+S79,130,Work,9,Married,female,SMH
+S80,171,Work,9,,male,TB1
+S81,303,Work,4,,male,DM
+S82,107,Work,2,,female,LBW
+S83,1188,Work,5,,male,MD
+S84,171,GraduateSchool,3,Married,male,TR
+S85,66,GraduateSchool,2,Married,female,DSG
+S86,113,GraduateSchool,3,Married,female,LRG
+S87,425,Work,2,,female,SS2
+S88,700,Music,5,In a Relationship,female,JLT
+S89,553,Family,15,In a Relationship,male,LSF
+S90,209,Family,7,Married,female,TSL
+S91,150,College,0,,female,LBC
+S92,175,College,0,Married,female,LLB
+S93,134,HighSchool,0,Married,female,DW
