@@ -1,0 +1,124 @@
+---
+title: "Challenge_hein"
+author: "Hein Brouwer"
+date: "2025-03-17"
+output: html_document
+---
+
+```{r packages}
+#install.packages("igraph")
+#install.packages("RColorBrewer")
+library(igraph)
+library(RColorBrewer)
+library(visNetwork)
+```
+```{r facebooknetwork}
+#build Facebook network
+Facebook_edge<-read.csv("Facebook_edge.csv",header=FALSE)
+Facebook_att<-read.csv("Facebook_att.csv",header = TRUE)
+Facebook_nodes<-data.frame(name=as.character(Facebook_att$NodeID),
+                           gender=as.character(Facebook_att$sex),
+                           group=as.character(Facebook_att$group))
+Facebook_edges<-data.frame(from=c(as.character(Facebook_edge[,1])),
+                           to=c(as.character(Facebook_edge[,2])))
+
+Facebook<-graph_from_data_frame(Facebook_edges,directed = FALSE,vertices = Facebook_nodes)
+summary(Facebook)
+
+```
+```{r highschoolnetwork}
+#build high school network
+highschool_edge<-read.csv("Highschool_network_edge.csv",header=FALSE)
+highschool_att<-read.csv("Highschool_network_att.csv",header = TRUE)
+
+highschool_nodes<-data.frame(name=as.character(highschool_att$NodeID),
+                             gender=as.character(highschool_att$Gender),
+                             hall=as.character(highschool_att$Hall))
+highschool_edges<-data.frame(from=c(as.character(highschool_edge[,1])),
+                             to=c(as.character(highschool_edge[,2])))
+Highschool<-graph_from_data_frame(highschool_edges,directed = FALSE,vertices = highschool_nodes)
+co <- components(Highschool)
+Highschool <- induced_subgraph(Highschool, which(co$membership == which.max(co$csize))) #use only the largest component for analysis
+summary(Highschool)
+
+```
+```{r Q1}
+# Analysis of shortest path lengths and degree distributions
+library(ggplot2)
+
+# Calculate shortest path lengths for Facebook network
+facebook_distances <- distances(Facebook)
+# Count pairs that can be reached within 6 steps
+facebook_within_6 <- sum(facebook_distances <= 6 & facebook_distances > 0)
+# Total possible pairs
+facebook_total_pairs <- vcount(Facebook) * (vcount(Facebook) - 1)
+# Calculate percentage
+facebook_percentage <- (facebook_within_6 / facebook_total_pairs) * 100
+
+# Calculate shortest path lengths for Highschool network
+highschool_distances <- distances(Highschool)
+# Count pairs that can be reached within 6 steps
+highschool_within_6 <- sum(highschool_distances <= 6 & highschool_distances > 0)
+# Total possible pairs
+highschool_total_pairs <- vcount(Highschool) * (vcount(Highschool) - 1)
+# Calculate percentage
+highschool_percentage <- (highschool_within_6 / highschool_total_pairs) * 100
+
+# Print results
+cat("Facebook network:\n")
+cat("Total nodes:", vcount(Facebook), "\n")
+cat("Total edges:", ecount(Facebook), "\n")
+cat("Percentage of node pairs reachable within 6 steps:", round(facebook_percentage, 2), "%\n")
+cat("Maximum shortest path length:", max(facebook_distances[facebook_distances < Inf]), "\n\n")
+
+cat("Highschool network:\n")
+cat("Total nodes:", vcount(Highschool), "\n")
+cat("Total edges:", ecount(Highschool), "\n")
+cat("Percentage of node pairs reachable within 6 steps:", round(highschool_percentage, 2), "%\n")
+cat("Maximum shortest path length:", max(highschool_distances[highschool_distances < Inf]), "\n\n")
+
+# Analyze degree distributions
+facebook_degrees <- degree(Facebook)
+highschool_degrees <- degree(Highschool)
+
+# Calculate summary statistics
+facebook_degree_stats <- summary(facebook_degrees)
+highschool_degree_stats <- summary(highschool_degrees)
+
+cat("Facebook degree distribution:\n")
+print(facebook_degree_stats)
+cat("\nHighschool degree distribution:\n")
+print(highschool_degree_stats)
+
+# Plot degree distributions
+par(mfrow=c(1,2))
+
+# Facebook degree distribution
+hist(facebook_degrees, 
+     main="Facebook Degree Distribution", 
+     xlab="Degree", 
+     col="lightblue", 
+     breaks=20)
+
+# Highschool degree distribution
+hist(highschool_degrees, 
+     main="Highschool Degree Distribution", 
+     xlab="Degree", 
+     col="lightgreen", 
+     breaks=15)
+
+# Compute average path lengths
+facebook_avg_path <- average.path.length(Facebook)
+highschool_avg_path <- average.path.length(Highschool)
+
+cat("\nAverage path length in Facebook network:", round(facebook_avg_path, 2), "\n")
+cat("Average path length in Highschool network:", round(highschool_avg_path, 2), "\n")
+
+# Compute diameter (longest shortest path)
+facebook_diameter <- diameter(Facebook)
+highschool_diameter <- diameter(Highschool)
+
+cat("Diameter of Facebook network:", facebook_diameter, "\n")
+cat("Diameter of Highschool network:", highschool_diameter, "\n")
+```
+
