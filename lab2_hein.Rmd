@@ -4,7 +4,7 @@ author: "Hein Brouwer"
 date: "14-3-2025"
 output: html_document
 ---
-
+#Exercise 1
 ```{r packages}
 #install.packages("igraph")
 #install.packages("visNetwork")
@@ -67,7 +67,7 @@ transitivity(Facebook, v="S1")
 deg <- degree(Facebook, mode = "all")
 cls <- closeness(Facebook, normalized = TRUE)
 btw <- betweenness(Facebook, directed = FALSE, normalized = TRUE)
-eig <- as.numeric(evcent(Facebook)$vector)
+eig <- evcent(Facebook)$vector
 lcl <- transitivity(Facebook, type = "local")
 
 #get top 5 metrics
@@ -76,7 +76,7 @@ cls_sort <- tail(sort(cls),5)
 btw_sort <- tail(sort(btw),5)
 eig_sort <- tail(sort(eig),5)
 lcl_sort <- tail(sort(lcl),5)
-eig_sort
+cls_sort
 ```
 
 
@@ -104,6 +104,7 @@ centr_degree(Facebook)$centralization
 components(Facebook)
 ```
 ```{r network_grouped}
+#group
 group <- unique(as.factor(V(Facebook)$group))
 
 pal <- brewer.pal(nlevels(group), "Set1")
@@ -113,5 +114,176 @@ group_colors <- setNames(pal,group)
 plot(Facebook, vertex.color = group_colors[V(Facebook)$group], main = "Network colored by group")
 legend("topleft", legend = names(group_colors), fill = group_colors, title = "group")
 
+#sex
+sex <- unique(as.factor(V(Facebook)$gender))
+
+pal <- brewer.pal(nlevels(sex), "Set1")
+
+group_colors <- c("#1F77B4", "#FF7F0E")
+names(group_colors) <- sex
+plot(Facebook, vertex.color = group_colors[V(Facebook)$gender], main = "Network colored by sex")
+legend("topleft", legend = names(group_colors), fill = group_colors, title = "sex")
+
+
 ```
+#Exercise 2
+```{r Q9}
+# Set seed for reproducibility
+set.seed(123)
+
+# Set number of vertices for all networks
+n <- 100
+
+# Create three ER networks with different probabilities
+ER1 <- sample_gnp(n, p = 0.01, directed = FALSE, loops = FALSE)
+ER2 <- sample_gnp(n, p = 0.05, directed = FALSE, loops = FALSE)
+ER3 <- sample_gnp(n, p = 0.2, directed = FALSE, loops = FALSE)
+
+# Plot the three networks
+par(mfrow = c(1, 3))
+plot(ER1, vertex.size = 3, vertex.label = NA, main = "ER1: p = 0.01")
+plot(ER2, vertex.size = 3, vertex.label = NA, main = "ER2: p = 0.05")
+plot(ER3, vertex.size = 3, vertex.label = NA, main = "ER3: p = 0.2")
+
+# For part 2: Study relationship between clustering coefficient and p
+p_values <- seq(0.01, 0.5, by = 0.05)
+n_large <- 1000
+clustering_coeffs <- numeric(length(p_values))
+
+for (i in 1:length(p_values)) {
+  g <- sample_gnp(n_large, p_values[i], directed = FALSE, loops = FALSE)
+  clustering_coeffs[i] <- transitivity(g, type = "global")
+}
+
+# Plot the relationship
+par(mfrow = c(1, 1))
+plot(p_values, clustering_coeffs, type = "b", 
+     xlab = "Probability (p)", ylab = "Clustering Coefficient",
+     main = "Relationship between p and Clustering Coefficient")
+```
+```{r Q10}
+# Create different small-world networks with varying rewiring probabilities
+Regular <- watts.strogatz.game(dim = 1, size = 300, nei = 6, p = 0)
+SW1 <- watts.strogatz.game(dim = 1, size = 300, nei = 6, p = 0.001)
+SW2 <- watts.strogatz.game(dim = 1, size = 300, nei = 6, p = 0.01)
+SW3 <- watts.strogatz.game(dim = 1, size = 300, nei = 6, p = 0.1)
+
+# Plot the networks
+par(mfrow = c(2, 2))
+plot(Regular, layout = layout_in_circle, vertex.label = NA, vertex.size = 3, 
+     main = "Regular: p = 0")
+plot(SW1, layout = layout_in_circle, vertex.label = NA, vertex.size = 3, 
+     main = "SW1: p = 0.001")
+plot(SW2, layout = layout_in_circle, vertex.label = NA, vertex.size = 3, 
+     main = "SW2: p = 0.01")
+plot(SW3, layout = layout_in_circle, vertex.label = NA, vertex.size = 3, 
+     main = "SW3: p = 0.1")
+
+# Calculate clustering coefficients and average path lengths
+cc_regular <- transitivity(Regular, type = "global")
+cc_sw1 <- transitivity(SW1, type = "global")
+cc_sw2 <- transitivity(SW2, type = "global")
+cc_sw3 <- transitivity(SW3, type = "global")
+
+apl_regular <- mean_distance(Regular)
+apl_sw1 <- mean_distance(SW1)
+apl_sw2 <- mean_distance(SW2)
+apl_sw3 <- mean_distance(SW3)
+
+# Create a dataframe for results
+sw_results <- data.frame(
+  Network = c("Regular (p=0)", "SW1 (p=0.001)", "SW2 (p=0.01)", "SW3 (p=0.1)"),
+  Clustering_Coefficient = c(cc_regular, cc_sw1, cc_sw2, cc_sw3),
+  Average_Path_Length = c(apl_regular, apl_sw1, apl_sw2, apl_sw3)
+)
+
+# Print the results
+print(sw_results)
+```
+```{r Q11}
+# Part 1: Create scale-free networks with different power values
+set.seed(123)
+
+# Generate networks with different power values
+g_power_005 <- barabasi.game(100, power = 0.05, m = 2, directed = FALSE, algorithm = "psumtree")
+g_power_05 <- barabasi.game(100, power = 0.5, m = 2, directed = FALSE, algorithm = "psumtree")
+g_power_1 <- barabasi.game(100, power = 1, m = 2, directed = FALSE, algorithm = "psumtree")
+g_power_15 <- barabasi.game(100, power = 1.5, m = 2, directed = FALSE, algorithm = "psumtree")
+
+# Calculate degrees for vertex sizing
+deg_005 <- degree(g_power_005)
+deg_05 <- degree(g_power_05)
+deg_1 <- degree(g_power_1)
+deg_15 <- degree(g_power_15)
+
+# Plot the networks with vertex size proportional to degree
+par(mfrow = c(2, 2))
+plot(g_power_005, vertex.size = deg_005/2 + 2, vertex.label = NA, 
+     main = "Power = 0.05")
+plot(g_power_05, vertex.size = deg_05/2 + 2, vertex.label = NA, 
+     main = "Power = 0.5")
+plot(g_power_1, vertex.size = deg_1/2 + 2, vertex.label = NA, 
+     main = "Power = 1")
+plot(g_power_15, vertex.size = deg_15/2 + 2, vertex.label = NA, 
+     main = "Power = 1.5")
+
+# Part 2: Test network resilience to random and targeted attacks
+# Function to simulate attacks and measure network integrity
+simulate_attacks <- function(g, attack_type = "random", steps = 20) {
+  n_vertices <- vcount(g)
+  n_to_remove <- floor(n_vertices / steps)
+  
+  # Metrics to track
+  largest_component_sizes <- numeric(steps + 1)
+  largest_component_sizes[1] <- components(g)$csize[1]
+  
+  g_current <- g
+  
+  for (i in 1:steps) {
+    if (attack_type == "random") {
+      # Random attack: remove random vertices
+      vertices_to_remove <- sample(V(g_current), n_to_remove)
+    } else {
+      # Targeted attack: remove vertices with highest degree
+      degrees <- degree(g_current)
+      vertices_to_remove <- V(g_current)[order(-degrees)][1:min(n_to_remove, vcount(g_current))]
+    }
+    
+    g_current <- delete_vertices(g_current, vertices_to_remove)
+    
+    # Calculate size of largest component
+    comp <- components(g_current)
+    largest_component_sizes[i + 1] <- ifelse(length(comp$csize) > 0, comp$csize[1], 0)
+  }
+  
+  return(largest_component_sizes / n_vertices)  # Return as fraction of original network
+}
+
+# Create two networks for resilience analysis
+g_05 <- barabasi.game(5000, power = 0.5, m = 2, directed = FALSE, algorithm = "psumtree")
+g_15 <- barabasi.game(5000, power = 1.5, m = 2, directed = FALSE, algorithm = "psumtree")
+
+# Simulate attacks
+random_attack_05 <- simulate_attacks(g_05, "random")
+targeted_attack_05 <- simulate_attacks(g_05, "targeted")
+random_attack_15 <- simulate_attacks(g_15, "random")
+targeted_attack_15 <- simulate_attacks(g_15, "targeted")
+
+# Plot results
+par(mfrow = c(1, 2))
+plot(0:20/20, random_attack_05, type = "l", col = "blue", lwd = 2,
+     xlab = "Fraction of Nodes Removed", ylab = "Largest Component Size (fraction)",
+     main = "Network Resilience (power = 0.5)", ylim = c(0, 1))
+lines(0:20/20, targeted_attack_05, col = "red", lwd = 2)
+legend("topright", c("Random Attack", "Targeted Attack"), 
+       col = c("blue", "red"), lwd = 2)
+
+plot(0:20/20, random_attack_15, type = "l", col = "blue", lwd = 2,
+     xlab = "Fraction of Nodes Removed", ylab = "Largest Component Size (fraction)",
+     main = "Network Resilience (power = 1.5)", ylim = c(0, 1))
+lines(0:20/20, targeted_attack_15, col = "red", lwd = 2)
+legend("topright", c("Random Attack", "Targeted Attack"), 
+       col = c("blue", "red"), lwd = 2)
+```
+
 

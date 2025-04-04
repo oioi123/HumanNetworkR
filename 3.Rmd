@@ -23,7 +23,7 @@ adj_matrix <- as.matrix(data)
 # Create graph from adjacency matrix
 ClassHNA <- graph_from_adjacency_matrix(adj_matrix, mode = "undirected", diag = FALSE)
 
-# Use the provided visualization code
+# visualization code
 set.seed(100)
 ClassHNA_interactive_layout <- visNetwork::visIgraph(ClassHNA) %>%
   visIgraphLayout(layout = "layout_nicely", smooth = FALSE) %>%

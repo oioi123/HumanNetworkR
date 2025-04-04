@@ -12,6 +12,7 @@ library(igraph)
 library(RColorBrewer)
 library(visNetwork)
 ```
+
 ```{r facebooknetwork}
 #build Facebook network
 Facebook_edge<-read.csv("Facebook_edge.csv",header=FALSE)
@@ -120,5 +121,137 @@ highschool_diameter <- diameter(Highschool)
 
 cat("Diameter of Facebook network:", facebook_diameter, "\n")
 cat("Diameter of Highschool network:", highschool_diameter, "\n")
+```
+```{r Q2}
+# 1. Calculate modularity based on gender
+genderCommunity <- V(Highschool)$gender
+genderCommunity <- replace(genderCommunity, genderCommunity=="female", 1)
+genderCommunity <- replace(genderCommunity, genderCommunity=="male", 2)
+genderCommunity <- replace(genderCommunity, genderCommunity=="unknown", 3)
+genderCommunity <- as.numeric(genderCommunity)
+gender.clustering <- make_clusters(Highschool, membership=genderCommunity)
+gender_modularity <- modularity(Highschool, membership=genderCommunity)
+cat("Modularity when community is defined by gender:", gender_modularity, "\n")
+
+# Calculate number of nodes in each gender community
+gender_counts <- table(genderCommunity)
+print(gender_counts)
+
+# 2. Calculate modularity based on residential hall
+hallCommunity <- V(Highschool)$hall
+# Convert hall names to numeric IDs
+unique_halls <- unique(hallCommunity)
+hall_ids <- 1:length(unique_halls)
+names(hall_ids) <- unique_halls
+hallCommunity_numeric <- hall_ids[hallCommunity]
+hall.clustering <- make_clusters(Highschool, membership=hallCommunity_numeric)
+hall_modularity <- modularity(Highschool, membership=hallCommunity_numeric)
+cat("Modularity when community is defined by residential hall:", hall_modularity, "\n")
+
+# Calculate number of nodes in each hall community
+hall_counts <- table(hallCommunity)
+print(hall_counts)
+
+# 3. Apply Louvain algorithm for community detection
+Louv <- cluster_louvain(Highschool)
+louv_modularity <- modularity(Louv)
+cat("Modularity using Louvain community detection:", louv_modularity, "\n")
+
+# Calculate number of communities and their sizes from Louvain algorithm
+louv_membership <- membership(Louv)
+louv_counts <- table(louv_membership)
+cat("Number of communities detected by Louvain algorithm:", length(louv_counts), "\n")
+print(louv_counts)
+
+# Create visualization of networks with different community structures
+# 1. Gender-based communities
+plot1 <- plot(Highschool, 
+     vertex.color=genderCommunity, 
+     vertex.size=5, 
+     vertex.label=NA, 
+     main="Communities based on Gender")
+
+# 2. Hall-based communities
+plot2 <- plot(Highschool, 
+     vertex.color=hallCommunity_numeric, 
+     vertex.size=5, 
+     vertex.label=NA, 
+     main="Communities based on Residential Hall")
+
+# 3. Louvain-detected communities
+plot3 <- plot(Highschool, 
+     vertex.color=louv_membership, 
+     vertex.size=5, 
+     vertex.label=NA, 
+     main="Communities detected by Louvain algorithm")
+
+# Analyze the differences between community structures
+cat("\nAnalysis of Community Structures:\n")
+cat("1. Gender-based communities:", length(unique(genderCommunity)), "communities\n")
+cat("2. Hall-based communities:", length(unique(hallCommunity_numeric)), "communities\n")
+cat("3. Louvain-detected communities:", length(unique(louv_membership)), "communities\n")
+
+# Calculate the distribution of shortest path lengths
+dist_matrix <- distances(Highschool)
+path_lengths <- dist_matrix[lower.tri(dist_matrix)]
+path_lengths <- path_lengths[is.finite(path_lengths)]  # Remove Inf values if any
+
+# Histogram of shortest path lengths
+hist(path_lengths, 
+     main="Distribution of Shortest Path Lengths in Highschool Network", 
+     xlab="Path Length", 
+     col="lightblue", 
+     breaks=max(path_lengths))
+
+# Calculate degree distribution
+deg <- degree(Highschool)
+
+# Histogram of degree distribution
+hist(deg, 
+     main="Degree Distribution in Highschool Network", 
+     xlab="Degree", 
+     col="lightgreen", 
+     breaks=15)
+
+# Add a vertical line at the mean degree
+abline(v=mean(deg), col="red", lwd=2, lty=2)
+text(mean(deg) + 1, max(hist(deg, plot=FALSE)$counts) * 0.8, 
+     paste("Mean =", round(mean(deg), 2)), col="red")
+
+# Add lines for percentiles
+quantiles <- quantile(deg, probs=c(0.25, 0.5, 0.75))
+abline(v=quantiles[1], col="blue", lwd=2, lty=3)
+abline(v=quantiles[2], col="blue", lwd=2, lty=1)
+abline(v=quantiles[3], col="blue", lwd=2, lty=3)
+
+text(quantiles[1] - 0.5, max(hist(deg, plot=FALSE)$counts) * 0.7, 
+     "25%", col="blue")
+text(quantiles[2] - 0.5, max(hist(deg, plot=FALSE)$counts) * 0.6, 
+     "50%", col="blue")
+text(quantiles[3] - 0.5, max(hist(deg, plot=FALSE)$counts) * 0.5, 
+     "75%", col="blue")
+```
+
+```{r}
+# For part 2: Study relationship between clustering coefficient and p
+p_values <- seq(0.01, 0.5, by = 0.05)
+
+Regular<-watts.strogatz.game(dim=1,size=300,nei=6, p=0.01)
+
+
+# Calculate the distribution of shortest path lengths
+dist_matrix <- distances(Regular)
+path_lengths <- dist_matrix[lower.tri(dist_matrix)]
+path_lengths <- path_lengths[is.finite(path_lengths)]  # Remove Inf values if any
+
+# Plot the relationship
+par(mfrow = c(1, 1))
+plot(p_values, clustering_coeffs, type = "b", 
+     xlab = "Probability (p)", ylab = "Clustering Coefficient",
+     main = "Relationship between p and Clustering Coefficient")
+
+Regular<-watts.strogatz.game(dim=1,size=300,nei=6, p=0)
+plot(Regular)
+
 ```
 
